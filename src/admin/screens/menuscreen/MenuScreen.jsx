@@ -39,7 +39,10 @@ import {
   doc, 
   updateDoc, 
   deleteDoc, 
-  getDoc 
+  getDoc,
+  getDocs,
+  query,
+  where
 } from "firebase/firestore";
 import { db } from "../../../services/firebase"; 
 
@@ -134,6 +137,7 @@ const MenuScreen = () => {
     updatePlato,
     deletePlato,
     loading,
+    fetchPlatos,
   } = useContext(DatabaseContext);
   const [visible, setVisible] = useState(false);
   const [imageSelectionVisible, setImageSelectionVisible] = useState(false);
@@ -154,6 +158,7 @@ const MenuScreen = () => {
   const [imageError, setImageError] = useState("");
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const scrollY = useSharedValue(0);
 
@@ -163,6 +168,22 @@ const MenuScreen = () => {
       opacity: withSpring(scrollY.value > 50 ? 0.8 : 1),
     };
   });
+
+  // Función para refrescar los platos desde Firebase
+  const refreshPlatos = async () => {
+    try {
+      if (typeof fetchPlatos === 'function') {
+        await fetchPlatos();
+      } else {
+        // Implementación alternativa si fetchPlatos no está disponible
+        const menuCollection = collection(db, "menu");
+        const snapshot = await getDocs(menuCollection);
+        // Aquí puedes manejar los datos si necesitas actualizar el estado local
+      }
+    } catch (error) {
+      console.error("Error al refrescar los platos:", error);
+    }
+  };
 
   const validateFields = () => {
     let isValid = true;
@@ -267,6 +288,8 @@ const MenuScreen = () => {
       return;
     }
 
+    setIsProcessing(true);
+
     // Preparar la imagen para almacenarla en Firebase
     const platoData = {
       nombre,
@@ -328,6 +351,9 @@ const MenuScreen = () => {
         setSnackbarMessage("Plato añadido correctamente");
       }
 
+      // Refrescar los datos
+      await refreshPlatos();
+      
       setSnackbarVisible(true);
       hideDialog();
     } catch (error) {
@@ -336,6 +362,8 @@ const MenuScreen = () => {
         "Error",
         "Hubo un problema al guardar el plato: " + error.message
       );
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -370,21 +398,19 @@ const MenuScreen = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              // Usar directamente la función del contexto si está disponible
+              setIsProcessing(true);
+              
+              // Intentar eliminar usando la función del contexto primero
               if (typeof deletePlato === 'function') {
                 await deletePlato(platoId);
               } else {
-                // O usar deleteDoc con una referencia al documento
+                // Alternativa directa con Firebase
                 const platoRef = doc(db, 'menu', platoId);
-                
-                // Verificar si el documento existe antes de eliminarlo
-                const platoDoc = await getDoc(platoRef);
-                if (!platoDoc.exists()) {
-                  throw new Error(`El plato con ID ${platoId} no existe`);
-                }
-                
                 await deleteDoc(platoRef);
               }
+              
+              // Refrescar los datos
+              await refreshPlatos();
               
               hideDialog();
               setSnackbarMessage('Plato eliminado correctamente');
@@ -392,6 +418,8 @@ const MenuScreen = () => {
             } catch (error) {
               console.error("Error eliminando plato:", error);
               Alert.alert('Error', 'No se pudo eliminar el plato: ' + error.message);
+            } finally {
+              setIsProcessing(false);
             }
           }
         }
@@ -401,33 +429,35 @@ const MenuScreen = () => {
 
   const handleToggleDisponible = async (plato) => {
     try {
+      setIsProcessing(true);
+      
+      const nuevoEstado = !plato.disponible;
+      
       // Usar directamente la función del contexto si está disponible
       if (typeof updatePlato === 'function') {
         await updatePlato(plato.id, {
-          disponible: !plato.disponible,
+          disponible: nuevoEstado,
           actualizadoAt: new Date().toISOString()
         });
       } else {
         // O usar updateDoc con una referencia al documento
         const platoRef = doc(db, 'menu', plato.id);
-        
-        // Verificar si el documento existe antes de actualizarlo
-        const platoDoc = await getDoc(platoRef);
-        if (!platoDoc.exists()) {
-          throw new Error(`El plato con ID ${plato.id} no existe`);
-        }
-        
         await updateDoc(platoRef, {
-          disponible: !plato.disponible,
+          disponible: nuevoEstado,
           actualizadoAt: new Date().toISOString()
         });
       }
       
-      setSnackbarMessage(`Plato ${plato.disponible ? 'desactivado' : 'activado'} correctamente`);
+      // Refrescar los datos
+      await refreshPlatos();
+      
+      setSnackbarMessage(`Plato ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`);
       setSnackbarVisible(true);
     } catch (error) {
       console.error("Error cambiando estado:", error);
       Alert.alert('Error', 'No se pudo cambiar el estado del plato: ' + error.message);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -498,17 +528,21 @@ const MenuScreen = () => {
                   item.disponible ? styles.disableButton : styles.enableButton,
                 ]}
                 onPress={() => handleToggleDisponible(item)}
+                disabled={isProcessing}
               >
                 <Text style={styles.actionButtonText}>
-                  {item.disponible ? "Desactivar" : "Activar"}
+                  {isProcessing ? "..." : (item.disponible ? "Desactivar" : "Activar")}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.deleteActionButton}
                 onPress={() => handleDeletePlato(item.id)}
+                disabled={isProcessing}
               >
-                <Text style={styles.deleteActionButtonText}>Eliminar</Text>
+                <Text style={styles.deleteActionButtonText}>
+                  {isProcessing ? "..." : "Eliminar"}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -635,7 +669,7 @@ const MenuScreen = () => {
         renderEmptyState()
       )}
 
-      <FAB style={styles.fab} icon="plus" color="white" onPress={showDialog} />
+      <FAB style={styles.fab} icon="plus" color="white" onPress={showDialog} disabled={isProcessing} />
 
       {/* Dialog para añadir o editar plato */}
       <Portal>
@@ -769,9 +803,9 @@ const MenuScreen = () => {
             </ScrollView>
           </Dialog.ScrollArea>
           <Dialog.Actions>
-            <Button onPress={hideDialog}>Cancelar</Button>
-            <Button onPress={handleSave} mode="contained">
-              {editMode ? "Actualizar" : "Añadir"}
+            <Button onPress={hideDialog} disabled={isProcessing}>Cancelar</Button>
+            <Button onPress={handleSave} mode="contained" disabled={isProcessing}>
+              {isProcessing ? "Procesando..." : (editMode ? "Actualizar" : "Añadir")}
             </Button>
             {editMode && (
               <Button
@@ -781,8 +815,9 @@ const MenuScreen = () => {
                   }
                 }}
                 textColor="red"
+                disabled={isProcessing}
               >
-                Eliminar
+                {isProcessing ? "..." : "Eliminar"}
               </Button>
             )}
           </Dialog.Actions>
