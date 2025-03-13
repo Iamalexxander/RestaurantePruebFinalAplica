@@ -19,10 +19,27 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.Restaurante"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f6cd25ca-95f5-440f-b7d1-d70c397cd089"
+      }
+    },
+    "owner": "alexxandergt",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enablePngCrunchInReleaseBuilds": false
+          }
+        }
+      ]
+    ]
   }
 }
