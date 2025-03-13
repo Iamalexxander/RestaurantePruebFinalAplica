@@ -207,8 +207,8 @@ const UserReservationsScreen = ({ navigation }) => {
       return () => unsubscribe();
     }, [user, processReservations])
   );
-
-  // Manejo de cambios en fecha y hora
+  
+  // Manejo de cambios en fecha y hora - CORREGIDO
   const onDateChange = useCallback((event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -861,11 +861,7 @@ const UserReservationsScreen = ({ navigation }) => {
                     mode="time"
                     is24Hour={true}
                     display="default"
-                    onChange={(event, selectedTime) => {
-                      if (selectedTime) {
-                        onTimeChange(selectedTime);
-                      }
-                    }}
+                    onChange={onTimeChange}
                   />
                 )}
               </View>

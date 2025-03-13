@@ -32,6 +32,16 @@ import Animated, {
 } from "react-native-reanimated";
 import { DatabaseContext } from "../../../contexts/DatabaseContext";
 import { LinearGradient } from "expo-linear-gradient";
+// Add missing Firebase imports
+import { 
+  collection, 
+  addDoc, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  getDoc 
+} from "firebase/firestore";
+import { db } from "../../../services/firebase"; 
 
 const { width } = Dimensions.get("window");
 
@@ -258,9 +268,6 @@ const MenuScreen = () => {
     }
 
     // Preparar la imagen para almacenarla en Firebase
-    // En un caso real, aquí habría que subir la imagen a Firebase Storage
-    // y obtener una URL, pero como ejemplo usamos la referencia local
-
     const platoData = {
       nombre,
       descripcion,
@@ -281,27 +288,42 @@ const MenuScreen = () => {
           throw new Error("ID de plato no válido");
         }
 
-        // Usar updateDoc con una referencia correcta al documento
-        const platoRef = doc(db, "menu", currentPlato.id);
-
-        // Verificar si el documento existe antes de actualizarlo
-        const platoDoc = await getDoc(platoRef);
-        if (!platoDoc.exists()) {
-          throw new Error(`El plato con ID ${currentPlato.id} no existe`);
+        // Usar directamente la función del contexto si está disponible
+        if (typeof updatePlato === 'function') {
+          await updatePlato(currentPlato.id, {
+            ...platoData,
+            actualizadoAt: new Date().toISOString(),
+          });
+        } else {
+          // O usar updateDoc con una referencia al documento
+          const platoRef = doc(db, "menu", currentPlato.id);
+          
+          // Verificar si el documento existe antes de actualizarlo
+          const platoDoc = await getDoc(platoRef);
+          if (!platoDoc.exists()) {
+            throw new Error(`El plato con ID ${currentPlato.id} no existe`);
+          }
+          
+          await updateDoc(platoRef, {
+            ...platoData,
+            actualizadoAt: new Date().toISOString(),
+          });
         }
-
-        await updateDoc(platoRef, {
-          ...platoData,
-          actualizadoAt: new Date().toISOString(),
-        });
 
         setSnackbarMessage("Plato actualizado correctamente");
       } else {
-        // Usar addDoc para nuevos documentos
-        const collectionRef = collection(db, "menu");
-        const newDocRef = await addDoc(collectionRef, {
-          ...platoData,
-        });
+        // Usar directamente la función del contexto si está disponible
+        if (typeof addPlato === 'function') {
+          await addPlato({
+            ...platoData,
+          });
+        } else {
+          // O usar addDoc para nuevos documentos
+          const menuCollection = collection(db, "menu");
+          await addDoc(menuCollection, {
+            ...platoData,
+          });
+        }
 
         setSnackbarMessage("Plato añadido correctamente");
       }
@@ -348,16 +370,22 @@ const MenuScreen = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              // Usar deleteDoc con una referencia correcta al documento
-              const platoRef = doc(db, 'menu', platoId);
-              
-              // Verificar si el documento existe antes de eliminarlo
-              const platoDoc = await getDoc(platoRef);
-              if (!platoDoc.exists()) {
-                throw new Error(`El plato con ID ${platoId} no existe`);
+              // Usar directamente la función del contexto si está disponible
+              if (typeof deletePlato === 'function') {
+                await deletePlato(platoId);
+              } else {
+                // O usar deleteDoc con una referencia al documento
+                const platoRef = doc(db, 'menu', platoId);
+                
+                // Verificar si el documento existe antes de eliminarlo
+                const platoDoc = await getDoc(platoRef);
+                if (!platoDoc.exists()) {
+                  throw new Error(`El plato con ID ${platoId} no existe`);
+                }
+                
+                await deleteDoc(platoRef);
               }
               
-              await deleteDoc(platoRef);
               hideDialog();
               setSnackbarMessage('Plato eliminado correctamente');
               setSnackbarVisible(true);
@@ -373,19 +401,27 @@ const MenuScreen = () => {
 
   const handleToggleDisponible = async (plato) => {
     try {
-      // Usar updateDoc con una referencia correcta al documento
-      const platoRef = doc(db, 'menu', plato.id);
-      
-      // Verificar si el documento existe antes de actualizarlo
-      const platoDoc = await getDoc(platoRef);
-      if (!platoDoc.exists()) {
-        throw new Error(`El plato con ID ${plato.id} no existe`);
+      // Usar directamente la función del contexto si está disponible
+      if (typeof updatePlato === 'function') {
+        await updatePlato(plato.id, {
+          disponible: !plato.disponible,
+          actualizadoAt: new Date().toISOString()
+        });
+      } else {
+        // O usar updateDoc con una referencia al documento
+        const platoRef = doc(db, 'menu', plato.id);
+        
+        // Verificar si el documento existe antes de actualizarlo
+        const platoDoc = await getDoc(platoRef);
+        if (!platoDoc.exists()) {
+          throw new Error(`El plato con ID ${plato.id} no existe`);
+        }
+        
+        await updateDoc(platoRef, {
+          disponible: !plato.disponible,
+          actualizadoAt: new Date().toISOString()
+        });
       }
-      
-      await updateDoc(platoRef, {
-        disponible: !plato.disponible,
-        actualizadoAt: new Date().toISOString()
-      });
       
       setSnackbarMessage(`Plato ${plato.disponible ? 'desactivado' : 'activado'} correctamente`);
       setSnackbarVisible(true);
