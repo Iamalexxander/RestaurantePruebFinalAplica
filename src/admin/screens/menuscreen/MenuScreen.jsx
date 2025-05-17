@@ -159,6 +159,10 @@ const MenuScreen = () => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Nuevo campo para stock
+  const [stock, setStock] = useState("10");
+  const [stockError, setStockError] = useState("");
 
   const scrollY = useSharedValue(0);
 
@@ -223,6 +227,20 @@ const MenuScreen = () => {
       setPrecioError("");
     }
 
+    // Validar stock (debe ser un número entero positivo)
+    if (!stock.trim()) {
+      setStockError("El stock es obligatorio");
+      isValid = false;
+    } else if (!/^\d+$/.test(stock)) {
+      setStockError("El stock debe ser un número entero");
+      isValid = false;
+    } else if (parseInt(stock) < 0) {
+      setStockError("El stock no puede ser negativo");
+      isValid = false;
+    } else {
+      setStockError("");
+    }
+
     // Validar categoría
     if (!categoria) {
       setCategoriaError("Debes seleccionar una categoría");
@@ -256,6 +274,8 @@ const MenuScreen = () => {
     setPrecioError("");
     setCategoriaError("");
     setImageError("");
+    setStock("10");
+    setStockError("");
   };
 
   const hideDialog = () => {
@@ -273,6 +293,8 @@ const MenuScreen = () => {
     setPrecioError("");
     setCategoriaError("");
     setImageError("");
+    setStock("10");
+    setStockError("");
   };
 
   const showImageSelection = () => {
@@ -300,6 +322,7 @@ const MenuScreen = () => {
       disponible: disponible,
       destacado: false,
       descuento: 0,
+      stock: parseInt(stock), // Nuevo campo de stock
       createdAt: new Date().toISOString(),
       actualizadoAt: new Date().toISOString(),
     };
@@ -374,6 +397,7 @@ const MenuScreen = () => {
     setPrecio(plato.precio.toString());
     setCategoria(plato.categoria);
     setDisponible(plato.disponible !== false);
+    setStock(plato.stock ? plato.stock.toString() : "10");
 
     // Buscar la imagen correspondiente en AVAILABLE_IMAGES
     const platoImage = AVAILABLE_IMAGES.find(
@@ -491,6 +515,14 @@ const MenuScreen = () => {
         ? item.imagen
         : require("../../../assets/default-image.png"));
 
+    // Determinar el color del stock según la cantidad
+    let stockColor = '#4CAF50'; // Verde por defecto
+    if (!item.stock || item.stock === 0) {
+      stockColor = '#F44336'; // Rojo si no hay stock
+    } else if (item.stock < 5) {
+      stockColor = '#FFC107'; // Amarillo si hay poco stock
+    }
+
     return (
       <Animated.View
         entering={FadeIn.delay(index * 100)}
@@ -519,6 +551,13 @@ const MenuScreen = () => {
                 {item.categoria}
               </Chip>
               <Text style={styles.foodPrice}>{item.precio.toFixed(2)} $</Text>
+            </View>
+
+            {/* Stock indicator */}
+            <View style={styles.stockContainer}>
+              <Text style={[styles.stockLabel, {color: stockColor}]}>
+                Stock: {item.stock || 0} unidades
+              </Text>
             </View>
 
             <View style={styles.foodActions}>
@@ -594,7 +633,7 @@ const MenuScreen = () => {
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#2196F3" />
         <Text style={styles.loadingText}>Cargando menú...</Text>
       </View>
     );
@@ -611,7 +650,7 @@ const MenuScreen = () => {
             colors={["rgba(0,0,0,0.6)", "rgba(0,0,0,0.4)"]}
             style={styles.headerGradient}
           >
-            <Text style={styles.headerTitle}>Nuestro Menú</Text>
+            <Text style={styles.headerTitle}>Panel Administrativo</Text>
             <Text style={styles.headerSubtitle}>
               {platos.length === 0
                 ? "Comienza a crear tu menú"
@@ -718,6 +757,19 @@ const MenuScreen = () => {
                 <Text style={styles.errorText}>{precioError}</Text>
               ) : null}
 
+              <TextInput
+                label="Stock disponible *"
+                value={stock}
+                onChangeText={setStock}
+                style={styles.input}
+                mode="outlined"
+                keyboardType="number-pad"
+                error={!!stockError}
+              />
+              {stockError ? (
+                <Text style={styles.errorText}>{stockError}</Text>
+              ) : null}
+
               <Menu
                 visible={categoriaMenuVisible}
                 onDismiss={() => setCategoriaMenuVisible(false)}
@@ -788,14 +840,14 @@ const MenuScreen = () => {
                       value="true"
                       position="leading"
                       labelStyle={styles.radioLabel}
-                      color="#FF6B6B"
+                      color="#2196F3"
                     />
                     <RadioButton.Item
                       label="No"
                       value="false"
                       position="leading"
                       labelStyle={styles.radioLabel}
-                      color="#FF6B6B"
+                      color="#2196F3"
                     />
                   </View>
                 </RadioButton.Group>
@@ -897,7 +949,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   header: {
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#2196F3", // Cambiado a azul para admin
     overflow: "hidden",
   },
   headerImage: {
@@ -910,6 +962,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
     paddingTop: 40,
+  },
+  logoContainer: {
+    position: "absolute",
+    top: 10,
+    left: 20,
+    zIndex: 10,
+  },
+  logoImage: {
+    width: 80,
+    height: 60,
   },
   headerTitle: {
     fontSize: 32,
@@ -967,7 +1029,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   categoryTextSelected: {
-    color: "#FF6B6B",
+    color: "#2196F3", // Cambiado a azul para admin
     fontWeight: "bold",
   },
   foodList: {
@@ -1020,6 +1082,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 12,
+  },
+  stockContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  stockLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "white",
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
   foodActions: {
     flexDirection: "row",
@@ -1093,7 +1167,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     bottom: 20,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#2196F3", // Cambiado a azul para admin
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: {
@@ -1178,7 +1252,7 @@ const styles = StyleSheet.create({
   },
   selectedImageItem: {
     borderWidth: 3,
-    borderColor: "#FF6B6B",
+    borderColor: "#2196F3", // Cambiado a azul para admin
   },
   imageSelectionImage: {
     width: "100%",
@@ -1197,7 +1271,7 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 12.5,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#2196F3", // Cambiado a azul para admin
     justifyContent: "center",
     alignItems: "center",
   },
@@ -1229,7 +1303,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   emptyStateButton: {
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#2196F3", // Cambiado a azul para admin
   },
   noCategoryItems: {
     padding: 30,

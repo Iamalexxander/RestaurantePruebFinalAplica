@@ -71,7 +71,7 @@ const UserPasswordScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <LinearGradient
-        colors={['#FF6B6B', '#FF8E8E']}
+        colors={['#FFC107', '#FF8E8E']}
         style={styles.header}
       >
         <Title style={styles.headerTitle}>Recuperar Contraseña</Title>
@@ -191,12 +191,12 @@ const styles = StyleSheet.create({
   },
   recoverButton: {
     marginTop: 10,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     paddingVertical: 6,
   },
   resetButton: {
     marginTop: 15,
-    borderColor: '#FF6B6B',
+    borderColor: '#FFC107',
     borderWidth: 1,
   },
   linkContainer: {
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   link: {
-    color: '#FF6B6B',
+    color: '#FFC107',
     fontWeight: 'bold',
   },
   successContainer: {

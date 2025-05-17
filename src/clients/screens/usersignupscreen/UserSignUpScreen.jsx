@@ -116,7 +116,7 @@ const UserSignUpScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <LinearGradient
-        colors={['#FF6B6B', '#FF8E8E']}
+        colors={['#FFC107', '#FF8E8E']}
         style={styles.header}
       >
         <Title style={styles.headerTitle}>Crear Cuenta</Title>
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
   signupButton: {
     marginTop: 10,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     paddingVertical: 6,
   },
   loginContainer: {
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   loginLink: {
-    color: '#FF6B6B',
+    color: '#FFC107',
     fontWeight: 'bold',
   },
 });

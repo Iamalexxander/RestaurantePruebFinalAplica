@@ -1,11 +1,9 @@
-// src/clients/screens/userprofilescreen/UserProfileScreen.jsx
 import React, { useState, useContext } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Alert,
 } from 'react-native';
 import {
@@ -19,7 +17,6 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { AuthContext } from '../../../contexts/AuthContext';
-import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const UserProfileScreen = ({ navigation }) => {
@@ -32,7 +29,6 @@ const UserProfileScreen = ({ navigation }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notificationsEnabled || true
   );
-  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
   const [loading, setLoading] = useState(false);
 
   const handleSaveProfile = async () => {
@@ -49,7 +45,6 @@ const UserProfileScreen = ({ navigation }) => {
         email,
         phone,
         notificationsEnabled,
-        profileImage,
       });
 
       if (success) {
@@ -92,62 +87,19 @@ const UserProfileScreen = ({ navigation }) => {
     );
   };
 
-  const pickImage = async () => {
-    try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (permissionResult.granted === false) {
-        Alert.alert('Permiso requerido', 'Necesitamos permiso para acceder a tu galería');
-        return;
-      }
-      
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType.Images, // Usar MediaType en lugar de MediaTypeOptions
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.5,
-      });
-      
-      if (!result.canceled) {
-        setProfileImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert('Error', 'No se pudo acceder a la galería de imágenes');
-    }
-  };
-
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#FF6B6B', '#FF8E8E']}
+        colors={["#FFC107", "#FFC160"]}
         style={styles.header}
       >
         <View style={styles.profileImageContainer}>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
-          ) : (
-            <Avatar.Text 
-              size={100} 
-              label={(user?.name || "U").substring(0, 2).toUpperCase()} 
-              backgroundColor="#FF8E8E"
-              color="white"
-            />
-          )}
-          
-          {editing && (
-            <TouchableOpacity 
-              style={styles.editImageButton}
-              onPress={pickImage}
-            >
-              <IconButton
-                icon="camera"
-                size={20}
-                iconColor="white"
-                style={{ margin: 0 }}
-              />
-            </TouchableOpacity>
-          )}
+          <Avatar.Text 
+            size={100} 
+            label={(user?.name || "U").substring(0, 2).toUpperCase()} 
+            backgroundColor="#FF8E8E"
+            color="black"
+          />
         </View>
         
         <Text style={styles.userName}>{user?.name || 'Usuario'}</Text>
@@ -226,7 +178,7 @@ const UserProfileScreen = ({ navigation }) => {
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
               disabled={!editing || loading}
-              color="#FF6B6B"
+              color="#FFC107"
             />
           </View>
           
@@ -298,7 +250,6 @@ const UserProfileScreen = ({ navigation }) => {
                 setName(user?.name || '');
                 setPhone(user?.phone || '');
                 setNotificationsEnabled(user?.notificationsEnabled || true);
-                setProfileImage(user?.profileImage || null);
               }}
               style={styles.cancelButton}
               disabled={loading}
@@ -344,28 +295,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25,
   },
   profileImageContainer: {
-    position: 'relative',
     marginBottom: 15,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: 'white',
-  },
-  editImageButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#FF6B6B',
-    borderRadius: 20,
-    width: 36,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
   },
   userName: {
     fontSize: 24,
@@ -430,11 +360,11 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     marginRight: 10,
-    borderColor: '#FF6B6B',
+    borderColor: '#FFC107',
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
   },
   logoutButton: {
     marginVertical: 20,

@@ -20,7 +20,8 @@ import {
   Banner,
   Button,
   Modal,
-  Portal
+  Portal,
+  ProgressBar,
 } from 'react-native-paper';
 import { DatabaseContext } from '../../../contexts/DatabaseContext';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -72,8 +73,8 @@ const CATEGORIES = [
 ];
 
 const UserMenuScreen = ({ navigation, route }) => {
-  const { platos, loading } = useContext(DatabaseContext);
-  const { addToCart, cartItems, clearCart } = useContext(CartContext);
+  const { platos, loading, updatePlato } = useContext(DatabaseContext);
+  const { addToCart, cartItems, clearCart, updateCartItemQuantity } = useContext(CartContext);
   const { user } = useContext(AuthContext);
 
   const [searchQuery, setSearchQuery] = useState(route.params?.searchQuery || '');
@@ -83,6 +84,7 @@ const UserMenuScreen = ({ navigation, route }) => {
   const [showReservationBanner, setShowReservationBanner] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [stockErrorMessage, setStockErrorMessage] = useState('');
 
   const scrollY = useSharedValue(0);
 
@@ -158,8 +160,8 @@ const UserMenuScreen = ({ navigation, route }) => {
 
   // Filtrar platos por categoría y búsqueda
   const filteredPlatos = platos.filter(plato => {
-    // Solo mostrar platos disponibles
-    if (!plato.disponible) return false;
+    // Solo mostrar platos disponibles y con stock > 0
+    if (!plato.disponible || (plato.stock !== undefined && plato.stock <= 0)) return false;
 
     const matchesSearch = plato.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
       plato.descripcion.toLowerCase().includes(searchQuery.toLowerCase());
@@ -178,9 +180,29 @@ const UserMenuScreen = ({ navigation, route }) => {
     return require('../../../assets/default-image.png');
   };
 
-  const handleAddToCart = (dish) => {
-    addToCart(dish);
-    setAddedToCartMessage(dish.nombre);
+  // Modificar la función handleAddToCart para tener en cuenta el stock
+  const handleAddToCart = async (dish) => {
+    try {
+      setStockErrorMessage('');
+      
+      // Obtener cantidad actual en el carrito (si existe)
+      const currentCartItem = cartItems.find(item => item.id === dish.id);
+      const currentQuantity = currentCartItem ? currentCartItem.cantidad : 0;
+      
+      // Verificar si hay suficiente stock
+      if (dish.stock !== undefined && currentQuantity >= dish.stock) {
+        setStockErrorMessage(`No hay suficiente stock de ${dish.nombre}. Disponibles: ${dish.stock}`);
+        return;
+      }
+      
+      // Añadir al carrito
+      addToCart(dish);
+      setAddedToCartMessage(dish.nombre);
+      
+    } catch (error) {
+      console.error("Error al añadir al carrito:", error);
+      Alert.alert("Error", "No se pudo añadir el plato al carrito");
+    }
   };
 
   const formatDate = (dateString) => {
@@ -199,10 +221,31 @@ const UserMenuScreen = ({ navigation, route }) => {
     }
   };
 
-  // Modifica la función handleConfirmOrder en UserMenuScreen.jsx
+  // Verificar stock disponible para todos los elementos del carrito
+  const validateCartStock = () => {
+    for (const cartItem of cartItems) {
+      const menuItem = platos.find(p => p.id === cartItem.id);
+      if (menuItem && menuItem.stock !== undefined && cartItem.cantidad > menuItem.stock) {
+        return {
+          valid: false,
+          message: `No hay suficiente stock de ${cartItem.nombre}. Disponibles: ${menuItem.stock}`
+        };
+      }
+    }
+    return { valid: true };
+  };
+
+  // Función modificada para confirmar el pedido
   const handleConfirmOrder = async () => {
     if (cartItems.length === 0) {
       Alert.alert("Error", "Tu carrito está vacío. Añade algún plato antes de continuar.");
+      return;
+    }
+
+    // Verificar stock para todos los items
+    const stockValidation = validateCartStock();
+    if (!stockValidation.valid) {
+      Alert.alert("Stock insuficiente", stockValidation.message);
       return;
     }
 
@@ -255,7 +298,21 @@ const UserMenuScreen = ({ navigation, route }) => {
       : item.precio;
 
     // Verificar si el plato está en el carrito
-    const isInCart = cartItems.some(cartItem => cartItem.id === item.id);
+    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+    const isInCart = !!cartItem;
+    const currentCartQuantity = cartItem ? cartItem.cantidad : 0;
+
+    // Calcular el porcentaje de stock disponible (para la barra de progreso)
+    const maxStock = item.stock || 10;
+    const stockPercentage = Math.min(1, Math.max(0, (maxStock - currentCartQuantity) / maxStock));
+    
+    // Determinar el color de la barra de stock según el porcentaje
+    let stockBarColor = '#4CAF50'; // Verde por defecto
+    if (stockPercentage <= 0.2) {
+      stockBarColor = '#F44336'; // Rojo si hay poco stock
+    } else if (stockPercentage <= 0.5) {
+      stockBarColor = '#FFC107'; // Amarillo si hay medio stock
+    }
 
     return (
       <Animated.View
@@ -290,6 +347,17 @@ const UserMenuScreen = ({ navigation, route }) => {
               {item.descripcion}
             </Text>
 
+            <View style={styles.stockIndicatorContainer}>
+              <Text style={styles.stockIndicatorText}>
+                Disponibles: {item.stock !== undefined ? item.stock - currentCartQuantity : 'Sin límite'}
+              </Text>
+              <ProgressBar 
+                progress={stockPercentage} 
+                color={stockBarColor} 
+                style={styles.stockProgressBar} 
+              />
+            </View>
+
             <View style={styles.dishFooter}>
               <Chip mode="outlined" style={styles.categoryChip} textStyle={styles.categoryChipText}>
                 {CATEGORIES.find(cat => cat.id === item.categoria)?.name || item.categoria}
@@ -309,6 +377,7 @@ const UserMenuScreen = ({ navigation, route }) => {
                 isInCart && styles.addButtonActive
               ]}
               onPress={() => handleAddToCart(item)}
+              disabled={item.stock !== undefined && currentCartQuantity >= item.stock}
             >
               <Image
                 source={isInCart
@@ -318,11 +387,11 @@ const UserMenuScreen = ({ navigation, route }) => {
               />
               {isInCart && (
                 <Badge
-                  size={20}
+                  size={22}
                   style={styles.itemCountBadge}
                   visible={true}
                 >
-                  {cartItems.find(cartItem => cartItem.id === item.id)?.cantidad || 0}
+                  {currentCartQuantity}
                 </Badge>
               )}
             </TouchableOpacity>
@@ -339,7 +408,7 @@ const UserMenuScreen = ({ navigation, route }) => {
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FFC107" />
         <Text style={styles.loadingText}>Cargando menú...</Text>
       </View>
     );
@@ -347,6 +416,25 @@ const UserMenuScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
+      {/* Banner de stock error */}
+      {stockErrorMessage && (
+        <Banner
+          visible={!!stockErrorMessage}
+          actions={[
+            {
+              label: 'Entendido',
+              onPress: () => setStockErrorMessage(''),
+            }
+          ]}
+          icon={({ size }) => (
+            <Icon name="alert-circle" size={size} color="#F44336" />
+          )}
+          style={styles.stockErrorBanner}
+        >
+          {stockErrorMessage}
+        </Banner>
+      )}
+
       {/* Banner de reserva */}
       {showReservationBanner && reservationDetails && (
         <Banner
@@ -387,7 +475,7 @@ const UserMenuScreen = ({ navigation, route }) => {
               value={searchQuery}
               style={styles.searchBar}
               icon="magnify"
-              iconColor="#FF6B6B"
+              iconColor="#FFC107"
             />
           </LinearGradient>
         </ImageBackground>
@@ -462,6 +550,8 @@ const UserMenuScreen = ({ navigation, route }) => {
             }
           }}
           color="white"
+          // Mostrar cantidad de productos en FAB
+          badge={getTotalCartItems() > 0 ? getTotalCartItems().toString() : undefined}
         />
       )}
 
@@ -486,7 +576,7 @@ const UserMenuScreen = ({ navigation, route }) => {
             <Text style={styles.confirmModalSubtitle}>Resumen de tu pedido</Text>
 
             <View style={styles.confirmModalReservation}>
-              <Icon name="calendar-clock" size={24} color="#FF6B6B" style={styles.confirmModalIcon} />
+              <Icon name="calendar-clock" size={24} color="#FFC107" style={styles.confirmModalIcon} />
               <View style={styles.confirmModalReservationDetails}>
                 <Text style={styles.confirmModalReservationTitle}>Reserva para {reservationDetails?.personas} personas</Text>
                 <Text style={styles.confirmModalReservationDate}>{formatDate(reservationDetails?.fecha)}</Text>
@@ -500,15 +590,25 @@ const UserMenuScreen = ({ navigation, route }) => {
             <FlatList
               data={cartItems}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.confirmModalItem}>
-                  <Text style={styles.confirmModalItemQty}>{item.cantidad}x</Text>
-                  <Text style={styles.confirmModalItemName}>{item.nombre}</Text>
-                  <Text style={styles.confirmModalItemPrice}>
-                    {(item.precio * item.cantidad).toFixed(2)} $
-                  </Text>
-                </View>
-              )}
+              renderItem={({ item }) => {
+                const menuItem = platos.find(p => p.id === item.id);
+                const stockAvailable = menuItem && menuItem.stock !== undefined ? menuItem.stock : "Sin límite";
+                
+                return (
+                  <View style={styles.confirmModalItem}>
+                    <Text style={styles.confirmModalItemQty}>{item.cantidad}x</Text>
+                    <View style={styles.confirmModalItemDetails}>
+                      <Text style={styles.confirmModalItemName}>{item.nombre}</Text>
+                      <Text style={styles.confirmModalItemStock}>
+                        Stock: {stockAvailable !== "Sin límite" ? `${stockAvailable}/${menuItem.stock}` : stockAvailable}
+                      </Text>
+                    </View>
+                    <Text style={styles.confirmModalItemPrice}>
+                      {(item.precio * item.cantidad).toFixed(2)} $
+                    </Text>
+                  </View>
+                );
+              }}
               style={styles.confirmModalItems}
             />
 
@@ -570,6 +670,11 @@ const styles = StyleSheet.create({
     borderColor: '#FFCC80',
     borderWidth: 1,
   },
+  stockErrorBanner: {
+    backgroundColor: '#FFEBEE',
+    borderColor: '#FFCDD2',
+    borderWidth: 1,
+  },
   header: {
     overflow: 'hidden',
   },
@@ -583,6 +688,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 20,
     paddingTop: 50,
+  },
+  logoContainer: {
+    position: "absolute",
+    top: 10,
+    left: 20,
+    zIndex: 10,
+  },
+  logoImage: {
+    width: 80,
+    height: 60,
   },
   headerTitle: {
     fontSize: 32,
@@ -637,7 +752,7 @@ const styles = StyleSheet.create({
   categoryIconContainerSelected: {
     backgroundColor: '#FFF8E1',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#FFC107', // Amarillo para usuario
   },
   categoryIcon: {
     width: 32,
@@ -650,7 +765,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   categoryTextSelected: {
-    color: '#FF6B6B',
+    color: '#FFC107', // Amarillo para usuario
     fontWeight: 'bold',
   },
   dishesList: {
@@ -679,7 +794,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     left: 15,
-    backgroundColor: '#FFC107',
+    backgroundColor: '#FFC107', // Amarillo para usuario
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,
@@ -726,11 +841,27 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 5
   },
+  stockIndicatorContainer: {
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  stockIndicatorText: {
+    color: 'white',
+    fontSize: 12,
+    marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 5
+  },
+  stockProgressBar: {
+    height: 5,
+    borderRadius: 3,
+  },
   dishFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 10,
   },
   categoryChip: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -768,7 +899,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107', // Amarillo para usuario
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
@@ -792,6 +923,8 @@ const styles = StyleSheet.create({
     top: -5,
     right: -5,
     backgroundColor: '#FF9800',
+    color: 'white',
+    fontWeight: 'bold',
   },
   emptyState: {
     flex: 1,
@@ -811,7 +944,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107', // Amarillo para usuario
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 25,
@@ -826,7 +959,7 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107', // Amarillo para usuario
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: {
@@ -862,7 +995,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   confirmModalHeader: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107', // Amarillo para usuario
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -897,7 +1030,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: 'center',
     borderLeftWidth: 3,
-    borderLeftColor: '#FF6B6B',
+    borderLeftColor: '#FFC107', // Amarillo para usuario
   },
   confirmModalIcon: {
     marginRight: 10,
@@ -909,6 +1042,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
+  },
+  resetButtonText: {
+    color: "black"
   },
   confirmModalReservationDate: {
     color: '#666',
@@ -927,6 +1063,7 @@ const styles = StyleSheet.create({
   confirmModalItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
@@ -935,11 +1072,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: 30,
   },
-  confirmModalItemName: {
+  confirmModalItemDetails: {
     flex: 1,
+  },
+  confirmModalItemName: {
+    fontWeight: '500',
+  },
+  confirmModalItemStock: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
   confirmModalItemPrice: {
     fontWeight: 'bold',
+    width: 70,
+    textAlign: 'right',
   },
   confirmModalSummary: {
     backgroundColor: '#f9f9f9',
@@ -971,7 +1118,7 @@ const styles = StyleSheet.create({
   confirmModalTotalValue: {
     fontWeight: 'bold',
     fontSize: 18,
-    color: '#FF6B6B',
+    color: '#FFC107', // Amarillo para usuario
   },
   confirmModalActions: {
     flexDirection: 'row',

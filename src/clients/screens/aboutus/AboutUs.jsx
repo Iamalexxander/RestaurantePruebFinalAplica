@@ -68,7 +68,7 @@ const AboutUs = () => {
         <Divider style={styles.divider} />
         <View style={styles.philosophyItem}>
           <View style={styles.philosophyIcon}>
-            <Ionicons name="create" size={24} color="#FF6B6B" />
+            <Ionicons name="create" size={24} color="#FFC107" />
           </View>
           <View style={styles.philosophyContent}>
             <Text style={styles.philosophyTitle}>Creatividad Culinaria</Text>
@@ -105,14 +105,14 @@ const AboutUs = () => {
               image: require('../../../assets/chef1.jpg'),
             },
             {
-              name: 'María González',
+              name: 'Javier Rodríguez',
               position: 'Chef de Pastelería',
-              image: require('../../../assets/chef2.jpg'),
+              image: require('../../../assets/chef3.jpg'),
             },
             {
-              name: 'Javier Rodríguez',
+              name: 'María González',
               position: 'Sommelier',
-              image: require('../../../assets/chef3.jpg'),
+              image: require('../../../assets/chef2.jpg'),
             },
           ].map((member, index) => (
             <Card key={index} style={styles.teamCard}>
@@ -143,6 +143,7 @@ const AboutUs = () => {
             icon="map-marker"
             onPress={openMap}
             style={styles.mapButton}
+            labelStyle={{ color: 'black' }}
           >
             Ver Ubicación
           </Button>
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mapButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
   },
   addressContainer: {
     marginBottom: 10,

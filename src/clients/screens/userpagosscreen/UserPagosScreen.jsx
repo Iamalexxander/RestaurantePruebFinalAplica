@@ -251,7 +251,7 @@ const handleProcessPayment = async () => {
           maxLength={19}
           style={styles.input}
           outlineColor="#ddd"
-          activeOutlineColor="#FF6B6B"
+          activeOutlineColor="#FFC107"
           // Propiedades reducidas
           dense
         />
@@ -269,7 +269,7 @@ const handleProcessPayment = async () => {
           placeholder="NOMBRE APELLIDO"
           style={styles.input}
           outlineColor="#ddd"
-          activeOutlineColor="#FF6B6B"
+          activeOutlineColor="#FFC107"
           autoCapitalize="characters"
           // Propiedades reducidas
           dense
@@ -297,7 +297,7 @@ const handleProcessPayment = async () => {
             maxLength={5}
             style={styles.input}
             outlineColor="#ddd"
-            activeOutlineColor="#FF6B6B"
+            activeOutlineColor="#FFC107"
             // Propiedades reducidas
             dense
           />
@@ -317,7 +317,7 @@ const handleProcessPayment = async () => {
             maxLength={4}
             style={styles.input}
             outlineColor="#ddd"
-            activeOutlineColor="#FF6B6B"
+            activeOutlineColor="#FFC107"
             secureTextEntry={true}
             // Propiedades reducidas
             dense
@@ -331,7 +331,7 @@ const handleProcessPayment = async () => {
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FFC107" />
         <Text style={styles.loadingText}>Cargando información de pago...</Text>
       </View>
     );
@@ -355,7 +355,7 @@ const handleProcessPayment = async () => {
   if (!orderData) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Icon name="alert-circle-outline" size={60} color="#FF6B6B" />
+        <Icon name="alert-circle-outline" size={60} color="#FFC107" />
         <Text style={styles.errorTitle}>No se pudo cargar el pedido</Text>
         <Text style={styles.errorMessage}>No se encontró la información del pedido para realizar el pago.</Text>
         <Button 
@@ -413,7 +413,7 @@ const handleProcessPayment = async () => {
       >
         <Surface style={styles.orderSummary} elevation={3}>
           <View style={styles.orderTitleRow}>
-            <Icon name="file-document-outline" size={22} color="#FF6B6B" />
+            <Icon name="file-document-outline" size={22} color="#FFC107" />
             <Text style={styles.orderTitle}>Resumen del pedido</Text>
           </View>
           
@@ -461,7 +461,7 @@ const handleProcessPayment = async () => {
         
         <Surface style={styles.paymentMethodContainer} elevation={3}>
           <View style={styles.sectionTitleRow}>
-            <Icon name="credit-card-outline" size={22} color="#FF6B6B" />
+            <Icon name="credit-card-outline" size={22} color="#FFC107" />
             <Text style={styles.sectionTitle}>Datos de pago</Text>
           </View>
           
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
   },
   errorButton: {
     marginTop: 10,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
   },
   header: {
     overflow: 'hidden',
@@ -695,7 +695,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#FFC107',
   },
   paymentMethodContainer: {
     borderRadius: 12,
@@ -780,11 +780,11 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     marginRight: 12,
-    borderColor: '#FF6B6B',
+    borderColor: '#FFC107',
     borderWidth: 2,
   },
   cancelButtonLabel: {
-    color: '#FF6B6B',
+    color: '#FFC107',
     fontWeight: 'bold',
   },
   payButton: {

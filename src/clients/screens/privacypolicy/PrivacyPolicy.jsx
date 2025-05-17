@@ -210,19 +210,19 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     marginBottom: 16,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
     marginBottom: 8,
   },
   lastUpdated: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(0, 0, 0, 0.8)',
   },
   introSection: {
     margin: 16,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   consentButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     borderRadius: 20,
   },
 });

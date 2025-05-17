@@ -1,4 +1,3 @@
-// src/clients/screens/userloginscreen/UserLoginScreen.jsx
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, Alert, Platform } from 'react-native';
 import { TextInput, Button, Text, Title, Surface, Divider } from 'react-native-paper';
@@ -39,10 +38,29 @@ const UserLoginScreen = ({ navigation }) => {
       console.log("Autenticación exitosa:", userCredential.user.uid);
       
       // Obtener datos del usuario desde Firestore
-      const userDoc = await getDoc(doc(db, "usuarios", userCredential.user.uid));
+      const userDocRef = doc(db, "usuarios", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        
+        // Verificar si el usuario es cliente o tiene rol diferente a admin
+        if (userData.rol === 'admin') {
+          setError('Esta sección es exclusiva para usuarios. Por favor, utiliza el panel de administración.');
+          
+          // Cerrar sesión
+          await auth.signOut();
+          
+          // Mostrar alerta adicional
+          Alert.alert(
+            "Acceso Incorrecto",
+            "Esta sección es exclusiva para usuarios. Como administrador, debes usar el panel de administración.",
+            [{ text: "Entendido", style: "default" }]
+          );
+          
+          setLoading(false);
+          return;
+        }
         
         // Preparar objeto del usuario con todos los datos
         const userInfo = {
@@ -119,15 +137,25 @@ const UserLoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#FF6B6B', '#FF8E8E']}
+        colors={['#FFC107', '#D4AF37']}
         style={styles.header}
       >
+        {/* Logo de ISTPET */}
+        <Image
+          source={require('../../../assets/ISTPET.png')}
+          style={styles.istpetLogo}
+          resizeMode="contain"
+        />
+        
+        {/* Logo original */}
         <Image
           source={require('../../../assets/images/logo.png')}
           style={styles.logo}
         />
-        <Title style={styles.appTitle}>Restaurante App</Title>
-        <Text style={styles.subtitle}>Explora nuestro menú y realiza pedidos</Text>
+        
+        <Title style={styles.appTitle}>Gestión de Restaurante</Title>
+        <Text style={styles.subtitle}>BAR INSTITUCIONAL</Text>
+        <Text style={styles.userOnlyText}>Acceso exclusivo para usuarios</Text>
       </LinearGradient>
 
       <Surface style={styles.formContainer}>
@@ -143,6 +171,7 @@ const UserLoginScreen = ({ navigation }) => {
           keyboardType="email-address"
           autoCapitalize="none"
           disabled={loading}
+          theme={{ colors: { primary: '#1A2E5C' } }}
         />
 
         <TextInput
@@ -156,6 +185,7 @@ const UserLoginScreen = ({ navigation }) => {
           style={styles.input}
           mode="outlined"
           disabled={loading}
+          theme={{ colors: { primary: '#1A2E5C' } }}
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -166,8 +196,9 @@ const UserLoginScreen = ({ navigation }) => {
           style={styles.loginButton}
           loading={loading}
           disabled={loading}
+          color="#D4AF37"
         >
-          Iniciar Sesión
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </Button>
 
         <View style={styles.signupContainer}>
@@ -192,7 +223,7 @@ const UserLoginScreen = ({ navigation }) => {
             mode="text"
             onPress={navigateToAdminLogin}
             style={styles.adminButton}
-            color="#555"
+            color="#1A2E5C"
             disabled={loading}
           >
             Acceso para administradores
@@ -217,38 +248,63 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
+  istpetLogo: {
+    width: 280,
+    height: 90,
+    marginBottom: 15,
+  },
   logo: {
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
     marginBottom: 10,
   },
   appTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#1A2E5C',
     marginBottom: 5,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
+    color: '#1A2E5C',
+  },
+  userOnlyText: {
+    fontSize: 14,
+    color: '#1A2E5C',
+    fontWeight: 'bold',
+    marginTop: 10,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 20,
   },
   formContainer: {
     margin: 20,
     padding: 20,
     borderRadius: 10,
     elevation: 4,
+    backgroundColor: 'white',
   },
   input: {
     marginBottom: 15,
+    backgroundColor: 'white',
   },
   errorText: {
     color: 'red',
     marginBottom: 10,
+    textAlign: 'center',
   },
   loginButton: {
     marginTop: 10,
-    backgroundColor: '#FF6B6B',
     paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#4B6CB7',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   signupContainer: {
     flexDirection: 'row',
@@ -259,7 +315,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   signupLink: {
-    color: '#FF6B6B',
+    color: '#1A2E5C',
     fontWeight: 'bold',
   },
   divider: {

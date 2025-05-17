@@ -145,7 +145,7 @@ const Help = () => {
               onPress={method.action}
             >
               <View style={styles.contactIcon}>
-                <Ionicons name={method.icon} size={24} color="#FF6B6B" />
+                <Ionicons name={method.icon} size={24} color=" #FFC160" />
               </View>
               <View style={styles.contactInfo}>
                 <Text style={styles.contactTitle}>{method.title}</Text>
@@ -198,19 +198,19 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     marginBottom: 16,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
     marginBottom: 8,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: 'rgba(0, 0, 0, 0.9)',
     textAlign: 'center',
   },
   section: {
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     height: 120,
   },
   submitButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     borderRadius: 20,
     marginTop: 8,
   },
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
   scheduleHours: {
     fontSize: 16,
-    color: '#FF6B6B',
+    color: '#FFC107',
   },
   divider: {
     backgroundColor: '#e0e0e0',

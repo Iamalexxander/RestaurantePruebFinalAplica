@@ -458,7 +458,7 @@ const UserOrdersScreen = () => {
           <ScrollView style={styles.modalScrollView}>
             <View style={styles.orderDetailHeader}>
               <LinearGradient
-                colors={['#FF6B6B', '#FF8E8E']}
+                colors={['#FFC107', '#FF8E8E']}
                 style={styles.orderDetailHeaderGradient}
               >
                 <Text style={styles.orderDetailTitle}>{currentStatus.title}</Text>
@@ -610,7 +610,7 @@ const UserOrdersScreen = () => {
   if (loading && !refreshing) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FFC107" />
         <Text style={styles.loadingText}>Cargando pedidos...</Text>
       </View>
     );
@@ -627,7 +627,7 @@ const UserOrdersScreen = () => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#FF6B6B', '#FF8E8E']}
+        colors={["#FFC107", "#FFC160"]}
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Mis Pedidos</Text>
@@ -669,7 +669,7 @@ const UserOrdersScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#FF6B6B']}
+              colors={['#FFC107']}
             />
           }
         />
@@ -680,7 +680,7 @@ const UserOrdersScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#FF6B6B']}
+              colors={['#FFC107']}
             />
           }
         >
@@ -729,12 +729,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
     marginBottom: 5,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(7, 7, 7, 0.8)',
   },
   filterContainer: {
     paddingVertical: 12,
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   filterOptionSelected: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
   },
   filterOptionText: {
     color: '#666',
@@ -861,7 +861,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   viewDetails: {
-    color: '#FF6B6B',
+    color: '#FFC107',
     fontWeight: 'bold',
   },
   actionButtonsContainer: {
@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   orderNowButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 25,
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
   totalDetailValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#FFC107',
   },
   detailPayButton: {
     marginTop: 10,

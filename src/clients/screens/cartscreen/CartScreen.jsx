@@ -542,7 +542,7 @@ const CartScreen = ({ navigation, route }) => {
               icon="minus"
               size={18}
               mode="contained"
-              containerColor="#FF6B6B"
+              containerColor="#FFC107"
               iconColor="white"
               style={styles.quantityButton}
               onPress={() => handleUpdateQuantity(item.id, item.cantidad - 1)}
@@ -554,7 +554,7 @@ const CartScreen = ({ navigation, route }) => {
               icon="plus"
               size={18}
               mode="contained"
-              containerColor="#FF6B6B"
+              containerColor="#FFC107"
               iconColor="white"
               style={styles.quantityButton}
               onPress={() => handleUpdateQuantity(item.id, item.cantidad + 1)}
@@ -568,7 +568,7 @@ const CartScreen = ({ navigation, route }) => {
           <IconButton
             icon="delete-outline"
             size={22}
-            iconColor="#FF6B6B"
+            iconColor="#FFC107"
             style={styles.deleteButton}
             onPress={() => removeFromCart(item.id)}
           />
@@ -584,7 +584,7 @@ const CartScreen = ({ navigation, route }) => {
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FFC107" />
         <Text style={styles.loadingText}>Cargando carrito...</Text>
       </View>
     );
@@ -684,7 +684,7 @@ const CartScreen = ({ navigation, route }) => {
               labelStyle={styles.browseButtonLabel}
               icon="food-fork-drink"
             >
-              Ver Menú
+              Ver Menú 
             </Button>
           </Animated.View>
         </View>
@@ -747,7 +747,7 @@ const CartScreen = ({ navigation, route }) => {
                       style={styles.promoInput}
                       mode="outlined"
                       outlineColor="#ddd"
-                      activeOutlineColor="#FF6B6B"
+                      activeOutlineColor="#FFC107"
                       autoCapitalize="characters"
                       error={!!promoCodeError}
                       right={
@@ -755,7 +755,7 @@ const CartScreen = ({ navigation, route }) => {
                           icon="tag-outline"
                           onPress={applyPromoCode}
                           disabled={!promoCode.trim()}
-                          color="#FF6B6B"
+                          color="#FFC107"
                         />
                       }
                     />
@@ -862,7 +862,7 @@ const CartScreen = ({ navigation, route }) => {
           contentContainerStyle={styles.modalContainer}
         >
           <LinearGradient
-            colors={["#FF6B6B", "#FF8A65"]}
+            colors={["#FFC107", "#FF8A65"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.modalHeader}
@@ -878,7 +878,7 @@ const CartScreen = ({ navigation, route }) => {
 
           <ScrollView style={styles.modalContent}>
             <View style={styles.modalSectionHeader}>
-              <Icon name="food" size={22} color="#FF6B6B" />
+              <Icon name="food" size={22} color="#FFC107" />
               <Text style={styles.modalSectionTitle}>Resumen de tu pedido</Text>
             </View>
 
@@ -887,7 +887,7 @@ const CartScreen = ({ navigation, route }) => {
                 <Icon
                   name="calendar-check"
                   size={24}
-                  color="#FF6B6B"
+                  color="#FFC107"
                   style={{ marginRight: 10 }}
                 />
                 <View>
@@ -1000,7 +1000,7 @@ const CartScreen = ({ navigation, route }) => {
             </Surface>
 
             <View style={styles.modalSectionHeader}>
-              <Icon name="credit-card-outline" size={22} color="#FF6B6B" />
+              <Icon name="credit-card-outline" size={22} color="#FFC107" />
               <Text style={styles.modalSectionTitle}>Método de pago</Text>
             </View>
 
@@ -1015,7 +1015,7 @@ const CartScreen = ({ navigation, route }) => {
                 <Icon
                   name="cash"
                   size={28}
-                  color={paymentMethod === "efectivo" ? "#FF6B6B" : "#666"}
+                  color={paymentMethod === "efectivo" ? "#FFC107" : "#666"}
                 />
                 <Text
                   style={[
@@ -1038,7 +1038,7 @@ const CartScreen = ({ navigation, route }) => {
                 <Icon
                   name="credit-card"
                   size={28}
-                  color={paymentMethod === "tarjeta" ? "#FF6B6B" : "#666"}
+                  color={paymentMethod === "tarjeta" ? "#FFC107" : "#666"}
                 />
                 <Text
                   style={[
@@ -1053,7 +1053,7 @@ const CartScreen = ({ navigation, route }) => {
             </View>
 
             <View style={styles.modalSectionHeader}>
-              <Icon name="text-box-outline" size={22} color="#FF6B6B" />
+              <Icon name="text-box-outline" size={22} color="#FFC107" />
               <Text style={styles.modalSectionTitle}>Notas adicionales</Text>
             </View>
 
@@ -1066,7 +1066,7 @@ const CartScreen = ({ navigation, route }) => {
               onChangeText={setNotes}
               style={styles.notesInput}
               outlineColor="#ddd"
-              activeOutlineColor="#FF6B6B"
+              activeOutlineColor="#FFC107"
             />
 
             <View style={styles.modalFootnote}>
@@ -1227,15 +1227,16 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
   browseButton: {
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#FFC107",
     paddingHorizontal: 30,
     paddingVertical: 8,
     borderRadius: 30,
     elevation: 3,
   },
   browseButtonLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
+    color: "black"
   },
   cartList: {
     padding: 15,
@@ -1323,7 +1324,7 @@ const styles = StyleSheet.create({
   itemSubtotal: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FF6B6B",
+    color: "#FFC107",
     marginVertical: 8,
   },
   deleteButton: {
@@ -1353,7 +1354,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   promoErrorText: {
-    color: "#FF6B6B",
+    color: "#FFC107",
     fontSize: 12,
     marginTop: 2,
     marginLeft: 8,
@@ -1450,7 +1451,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#FF6B6B",
+    color: "#FFC107",
   },
   actionButtons: {
     flexDirection: "row",
@@ -1459,16 +1460,16 @@ const styles = StyleSheet.create({
   clearButton: {
     flex: 1,
     marginRight: 10,
-    borderColor: "#FF6B6B",
+    borderColor: "#FFC107",
     borderWidth: 2,
   },
   clearButtonLabel: {
-    color: "#FF6B6B",
+    color: "#FFC107",
     fontWeight: "bold",
   },
   checkoutButton: {
     flex: 2,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#FFC107",
     elevation: 3,
   },
   checkoutButtonLabel: {
@@ -1481,7 +1482,7 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 220,
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#FFC107",
     elevation: 5,
   },
   modalContainer: {
@@ -1529,7 +1530,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     borderLeftWidth: 3,
-    borderLeftColor: "#FF6B6B",
+    borderLeftColor: "#FFC107",
     elevation: 2,
   },
   modalReservationTitle: {
@@ -1579,7 +1580,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     width: 35,
-    color: "#FF6B6B",
+    color: "#FFC107",
   },
   modalItemName: {
     flex: 1,
@@ -1631,7 +1632,7 @@ const styles = StyleSheet.create({
   modalTotalValue: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#FF6B6B",
+    color: "#FFC107",
   },
   paymentMethods: {
     flexDirection: "row",
@@ -1652,7 +1653,7 @@ const styles = StyleSheet.create({
   },
   selectedPaymentMethod: {
     backgroundColor: "#FFF1F1",
-    borderColor: "#FF6B6B",
+    borderColor: "#FFC107",
     elevation: 2,
   },
   paymentMethodText: {
@@ -1661,7 +1662,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   selectedPaymentMethodText: {
-    color: "#FF6B6B",
+    color: "#FFC107",
     fontWeight: "bold",
   },
   notesInput: {
@@ -1691,11 +1692,11 @@ const styles = StyleSheet.create({
   modalCancelButton: {
     flex: 1,
     marginRight: 10,
-    borderColor: "#FF6B6B",
+    borderColor: "#FFC107",
     borderWidth: 2,
   },
   modalCancelButtonLabel: {
-    color: "#FF6B6B",
+    color: "#FFC107",
     fontWeight: "bold",
   },
   modalConfirmButton: {

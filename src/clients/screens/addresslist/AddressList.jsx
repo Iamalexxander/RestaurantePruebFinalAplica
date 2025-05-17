@@ -177,7 +177,7 @@ const AddressList = () => {
             <Ionicons
               name={item.name.toLowerCase() === 'casa' ? 'home' : 'briefcase'}
               size={20}
-              color="#FF6B6B"
+              color="#FFC107"
               style={styles.icon}
             />
             <Text style={styles.addressName}>{item.name}</Text>
@@ -255,7 +255,7 @@ const AddressList = () => {
   if (loading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FFC107" />
         <Text style={styles.loadingText}>Cargando tus direcciones...</Text>
       </View>
     );
@@ -346,7 +346,7 @@ const AddressList = () => {
             <Button
               mode="contained"
               onPress={saveAddress}
-              style={[styles.modalButton, { backgroundColor: '#FF6B6B' }]}
+              style={[styles.modalButton, { backgroundColor: '#FFC107' }]}
             >
               Guardar
             </Button>
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
   },
   actionButtonLabel: {
     fontSize: 12,
-    color: '#FF6B6B',
+    color: '#FFC107',
   },
   iconButtons: {
     flexDirection: 'row',
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
   },
   emptyContainer: {
     flex: 1,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFC107',
     borderRadius: 20,
     paddingHorizontal: 20,
     marginTop: 10,

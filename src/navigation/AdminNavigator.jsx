@@ -1,6 +1,5 @@
-// src/navigation/AdminNavigator.jsx
-
-import React from 'react';
+import React, { useMemo } from 'react';
+import { Image, Text, View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,41 +13,116 @@ import AdminProfileScreen from '../admin/screens/profilescreen/AdminProfileScree
 
 const Tab = createBottomTabNavigator();
 
-const AdminNavigator = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          
-          if (route.name === 'Menu') {
-            iconName = focused ? 'restaurant' : 'restaurant-outline';
-          } else if (route.name === 'Pedidos') {
-            iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'Reservas') {
-            iconName = focused ? 'calendar' : 'calendar-outline';
-          } else if (route.name === 'Confirmación') {
-            iconName = focused ? 'checkmark-circle' : 'checkmark-circle-outline';
-          } else if (route.name === 'Pagos') {
-            iconName = focused ? 'cash' : 'cash-outline';
-          } else if (route.name === 'Promociones') {
-            iconName = focused ? 'pricetag' : 'pricetag-outline';
-          } else if (route.name === 'Perfil') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
+// Componentes memoizados para mejorar rendimiento
+const HeaderLogo = React.memo(() => (
+  <Image
+    source={require("../assets/ISTPET.png")}
+    style={styles.headerLogo}
+    fadeDuration={0}
+  />
+));
 
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Menu" component={MenuScreen} />
-      <Tab.Screen name="Pedidos" component={PedidosScreen} />
-      <Tab.Screen name="Reservas" component={ReservasScreen} />
-      <Tab.Screen name="Pagos" component={PagosScreen} />
-      <Tab.Screen name="Promociones" component={PromocionesScreen} />
-      <Tab.Screen name="Perfil" component={AdminProfileScreen} />
+// Mapeamos iconos para evitar condicionales repetidos
+const ICON_MAPPING = {
+  'Menu': ['restaurant', 'restaurant-outline'],
+  'Pedidos': ['list', 'list-outline'],
+  'Reservas': ['calendar', 'calendar-outline'],
+  'Confirmación': ['checkmark-circle', 'checkmark-circle-outline'],
+  'Pagos': ['cash', 'cash-outline'],
+  'Promociones': ['pricetag', 'pricetag-outline'],
+  'Perfil': ['person', 'person-outline']
+};
+
+// Crear un componente de título de cabecera memoizado
+const HeaderTitle = React.memo(({ iconName, title }) => (
+  <View style={styles.headerTitleContainer}>
+    <Ionicons name={iconName} size={22} color="#000" style={styles.headerIcon} />
+    <Text style={styles.headerText}>{title}</Text>
+  </View>
+));
+
+const AdminNavigator = () => {
+  const screenOptions = ({ route }) => ({
+    tabBarIcon: ({ focused, color, size }) => {
+      const iconName = ICON_MAPPING[route.name]?.[focused ? 0 : 1] || 'help-outline';
+      return <Ionicons name={iconName} size={size} color={color} />;
+    },
+    headerRight: () => <HeaderLogo />,
+    headerTitleAlign: 'left',
+    headerLeftContainerStyle: { paddingLeft: 10 },
+    headerRightContainerStyle: { paddingRight: 10 },
+    // Optimizaciones adicionales
+    tabBarActiveTintColor: '#157efb',
+    tabBarInactiveTintColor: 'gray',
+    tabBarHideOnKeyboard: true,
+    lazy: true
+  });
+
+  return (
+    <Tab.Navigator screenOptions={screenOptions}>
+      <Tab.Screen 
+        name="Menu" 
+        component={MenuScreen} 
+        options={{
+          headerTitle: () => <HeaderTitle iconName="restaurant" title="Menú" />,
+        }}
+      />
+      <Tab.Screen 
+        name="Pedidos" 
+        component={PedidosScreen}
+        options={{
+          headerTitle: () => <HeaderTitle iconName="list" title="Pedidos" />,
+        }}
+      />
+      <Tab.Screen 
+        name="Reservas" 
+        component={ReservasScreen}
+        options={{
+          headerTitle: () => <HeaderTitle iconName="calendar" title="Reservas" />,
+        }}
+      />
+      <Tab.Screen 
+        name="Pagos" 
+        component={PagosScreen}
+        options={{
+          headerTitle: () => <HeaderTitle iconName="cash" title="Pagos" />,
+        }}
+      />
+      <Tab.Screen 
+        name="Promociones" 
+        component={PromocionesScreen}
+        options={{
+          headerTitle: () => <HeaderTitle iconName="pricetag" title="Promociones" />,
+        }}
+      />
+      <Tab.Screen 
+        name="Perfil" 
+        component={AdminProfileScreen}
+        options={{
+          headerTitle: () => <HeaderTitle iconName="person" title="Perfil" />,
+        }}
+      />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  headerLogo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    marginRight: 10,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+});
 
 export default AdminNavigator;

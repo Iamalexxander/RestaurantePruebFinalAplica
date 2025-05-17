@@ -423,7 +423,7 @@ const UserReservationsScreen = ({ navigation }) => {
       const selectedDay = day.dateString;
 
       const updatedMarkedDates = {
-        [selectedDay]: { selected: true, selectedColor: "#FF6B6B" },
+        [selectedDay]: { selected: true, selectedColor: "#FFC107" },
       };
 
       setMarkedDates(updatedMarkedDates);
@@ -683,7 +683,7 @@ const UserReservationsScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FFC107" />
         <Text style={styles.loadingText}>Cargando reservas...</Text>
       </View>
     );
@@ -691,7 +691,7 @@ const UserReservationsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={["#FF6B6B", "#FF8E8E"]} style={styles.header}>
+      <LinearGradient colors={["#FFC107", "#FFC160"]} style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Mis Reservas</Text>
           <TouchableOpacity
@@ -709,7 +709,7 @@ const UserReservationsScreen = ({ navigation }) => {
           <Icon
             name="plus"
             size={20}
-            color="#FF6B6B"
+            color="#FFC107"
             style={styles.newReservationIcon}
           />
           <Text style={styles.newReservationText}>Nueva Reserva</Text>
@@ -764,7 +764,7 @@ const UserReservationsScreen = ({ navigation }) => {
                 style={styles.makeReservationButton}
               >
                 <LinearGradient
-                  colors={["#FF6B6B", "#FF8E8E"]}
+                  colors={["#FFC107", "#FFC160"]}
                   style={styles.gradientButton}
                 >
                   <Icon
@@ -822,10 +822,10 @@ const UserReservationsScreen = ({ navigation }) => {
               markedDates={markedDates}
               minDate={new Date().toISOString().split("T")[0]}
               theme={{
-                selectedDayBackgroundColor: "#FF6B6B",
-                todayTextColor: "#FF6B6B",
-                arrowColor: "#FF6B6B",
-                dotColor: "#FF6B6B",
+                selectedDayBackgroundColor: "#FFC107",
+                todayTextColor: "#FFC107",
+                arrowColor: "#FFC107",
+                dotColor: "#FFC107",
                 textDayFontSize: 14,
                 textMonthFontSize: 16,
                 textDayHeaderFontSize: 14,
@@ -920,7 +920,7 @@ const UserReservationsScreen = ({ navigation }) => {
               keyboardType="number-pad"
               style={styles.input}
               mode="outlined"
-              activeOutlineColor="#FF6B6B"
+              activeOutlineColor="#FFC107"
               left={<TextInput.Icon icon="account-group" color="#666" />}
             />
 
@@ -930,7 +930,7 @@ const UserReservationsScreen = ({ navigation }) => {
               onChangeText={setNotes}
               style={styles.input}
               mode="outlined"
-              activeOutlineColor="#FF6B6B"
+              activeOutlineColor="#FFC107"
               multiline
               numberOfLines={3}
               placeholder="Ej: Preferencia de mesa, alergias, ocasión especial..."
@@ -1000,7 +1000,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "white",
+    color: "black",
   },
   backButton: {
     width: 40,
@@ -1024,9 +1024,10 @@ const styles = StyleSheet.create({
   },
   newReservationIcon: {
     marginRight: 8,
+    color: "black",
   },
   newReservationText: {
-    color: "#FF6B6B",
+    color: "black",
     fontWeight: "bold",
     fontSize: 15,
   },
@@ -1057,10 +1058,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   makeReservationButton: {
+    backgroundColor:"#FFC107",
     borderRadius: 25,
     overflow: "hidden",
     elevation: 6,
-    shadowColor: "#FF6B6B",
+    shadowColor: "#FFC107",
     shadowOffset: {
       width: 0,
       height: 3,
@@ -1077,11 +1079,12 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginRight: 8,
+    color: "black",
   },
   makeReservationText: {
-    color: "white",
+    color: "black",
     fontWeight: "bold",
-    fontSize: 17,
+    fontSize: 18,
   },
   reservationsList: {
     paddingBottom: 20,
@@ -1270,7 +1273,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#FFC107",
   },
   modalTitle: {
     fontSize: 20,
@@ -1341,7 +1344,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
   },
   ubicacionOptionSelected: {
-    borderColor: "#FF6B6B",
+    borderColor: "#FFC107",
     backgroundColor: "rgba(255, 107, 107, 0.1)",
   },
   ubicacionIcon: {
@@ -1354,7 +1357,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   ubicacionTextSelected: {
-    color: "#FF6B6B",
+    color: "#FFC107",
     fontWeight: "bold",
   },
   input: {
@@ -1367,7 +1370,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
     borderLeftWidth: 3,
-    borderLeftColor: "#FF6B6B",
+    borderLeftColor: "#FFC107",
   },
   reservationInfoText: {
     fontSize: 14,
@@ -1386,7 +1389,7 @@ const styles = StyleSheet.create({
   },
   modalSubmitButton: {
     flex: 1,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#FFC107",
   },
   loadingText: {
     marginTop: 15,
@@ -1407,7 +1410,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   retryButton: {
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#FFC107",
   },
 });
 

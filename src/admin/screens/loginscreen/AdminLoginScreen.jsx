@@ -4,7 +4,7 @@ import { View, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { TextInput, Button, Text, Title, Surface, Divider } from 'react-native-paper';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../../services/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -64,10 +64,17 @@ const AdminLoginScreen = ({ navigation }) => {
         
       } else {
         // No es administrador
-        setError('No tienes permisos de administrador');
+        setError('No tienes permisos de administrador. Esta sección es exclusiva para administradores.');
         
         // Cerrar sesión
         await auth.signOut();
+        
+        // Mostrar alerta adicional
+        Alert.alert(
+          "Acceso Denegado",
+          "Esta sección es exclusiva para administradores del sistema. Por favor, utiliza la sección de usuarios si no eres administrador.",
+          [{ text: "Entendido", style: "default" }]
+        );
       }
       
     } catch (error) {
@@ -169,12 +176,20 @@ const AdminLoginScreen = ({ navigation }) => {
         colors={['#4B6CB7', '#182848']}
         style={styles.header}
       >
+        {/* Logo de ISTPET agregado arriba del logo existente */}
+        <Image
+          source={require('../../../assets/ISTPET.png')}
+          style={styles.istpetLogo}
+          resizeMode="contain"
+        />
+        
         <Image
           source={require('../../../assets/images/logo.png')}
           style={styles.logo}
         />
         <Title style={styles.appTitle}>Gestión de Restaurante</Title>
         <Text style={styles.subtitle}>Panel de Administración</Text>
+        <Text style={styles.adminOnlyText}>Acceso exclusivo para administradores</Text>
       </LinearGradient>
 
       <Surface style={styles.formContainer}>
@@ -214,7 +229,7 @@ const AdminLoginScreen = ({ navigation }) => {
           loading={loading}
           disabled={loading}
         >
-          Iniciar Sesión
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </Button>
 
         <Divider style={styles.divider} />
@@ -237,7 +252,6 @@ const AdminLoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  // Mantener los estilos actuales
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -251,9 +265,14 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
+  istpetLogo: {
+    width: 280,
+    height:90,
+    marginBottom: 15,
+  },
   logo: {
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
     marginBottom: 10,
   },
   appTitle: {
@@ -265,6 +284,16 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: 'rgba(255,255,255,0.8)',
+  },
+  adminOnlyText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: 'bold',
+    marginTop: 10,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 20,
   },
   formContainer: {
     margin: 20,
@@ -284,6 +313,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: '#4B6CB7',
     paddingVertical: 6,
+  },
+    buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   divider: {
     marginVertical: 20,
